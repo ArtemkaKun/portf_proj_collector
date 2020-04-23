@@ -1,9 +1,9 @@
 package main
 
 type Repository struct {
-	FullName     string
-	LastPushDays uint32
-	StarsCount   uint32
+	FullName     string `json:"fullName"`
+	LastPushDays uint32 `json:"lastPushDays"`
+	StarsCount   uint32 `json:"starsCount"`
 }
 
 type ByLastCommit []Repository
@@ -18,4 +18,9 @@ func (repos ByLastCommit) Less(i, j int) bool {
 
 func (repos ByLastCommit) Swap(i, j int) {
 	repos[i], repos[j] = repos[j], repos[i]
+}
+
+type GetProjectsRequest struct {
+	ProjectsCount uint16 `json:"projectsCount"`
+	Username      string `json:"username"`
 }

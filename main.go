@@ -1,11 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"log"
+	"net/http"
+)
 
 func main() {
-	projects := GetLastActiveProjects(10)
-
-	for _, one_proj := range projects {
-		fmt.Println(one_proj)
-	}
+	log.Fatal(http.ListenAndServe(":8000", router))
 }

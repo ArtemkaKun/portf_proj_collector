@@ -11,14 +11,12 @@ import (
 
 var Client = *github.NewClient(nil)
 
-const MY_NICKNAME = "artemkakun"
-
-func GetLastActiveProjects(project_count uint16) []Repository {
-	allProjects := GetMyProjects()
+func GetLastActiveProjects(projectCount uint16, user string) []Repository {
+	allProjects := GetMyProjects(user)
 	SortProjects(allProjects)
 
 	var lastRepos []Repository
-	for i := uint16(0); i < project_count; i++ {
+	for i := uint16(0); i < projectCount; i++ {
 		lastRepos = append(lastRepos, allProjects[i])
 	}
 
@@ -29,8 +27,8 @@ func SortProjects(projects []Repository) {
 	sort.Sort(ByLastCommit(projects))
 }
 
-func GetMyProjects() []Repository {
-	reposList, _, err := Client.Repositories.List(context.Background(), MY_NICKNAME, nil)
+func GetMyProjects(user string) []Repository {
+	reposList, _, err := Client.Repositories.List(context.Background(), user, nil)
 	if err != nil {
 		fmt.Println(fmt.Errorf("Cannot read from client: %v\n", err))
 	}
