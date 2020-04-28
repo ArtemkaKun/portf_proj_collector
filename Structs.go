@@ -3,7 +3,7 @@ package main
 type Repository struct {
 	FullName     string `json:"fullName"`
 	LastPushDays uint32 `json:"lastPushDays"`
-	StarsCount   uint32 `json:"starsCount"`
+	StarsCount   uint16 `json:"starsCount"`
 }
 
 type ByLastCommit []Repository

@@ -46,11 +46,19 @@ func DecodeReposData(data *github.Repository) Repository {
 
 	decodedRepo.FullName = data.GetFullName()
 	decodedRepo.LastPushDays = CalcDaysToLastPush(data.GetPushedAt())
-	decodedRepo.StarsCount = uint32(data.GetStargazersCount())
+	decodedRepo.StarsCount = uint16(data.GetStargazersCount())
 
 	return decodedRepo
 }
 
 func CalcDaysToLastPush(lastPushTimestamp github.Timestamp) uint32 {
 	return uint32(math.Round(time.Now().Sub(lastPushTimestamp.Time).Hours() / 24))
+}
+
+func CalcAllStarts(user string) (starsCount uint16) {
+	for _, stars := range GetMyProjects(user) {
+		starsCount += stars.StarsCount
+	}
+
+	return
 }

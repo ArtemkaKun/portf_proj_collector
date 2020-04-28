@@ -11,6 +11,19 @@ var router = mux.NewRouter()
 
 func init() {
 	router.HandleFunc("/activeProjects", GetActiveProjects).Methods("GET")
+	router.HandleFunc("/starsCount", GetStarsCount).Methods("GET")
+}
+
+func GetStarsCount(writer http.ResponseWriter, req *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+
+	newMessage := new(GetProjectsRequest)
+	decodeRequestMessage(req, newMessage)
+
+	err := json.NewEncoder(writer).Encode(CalcAllStarts(newMessage.Username))
+	if err != nil {
+		EncodingJSONError(err)
+	}
 }
 
 func GetActiveProjects(writer http.ResponseWriter, req *http.Request) {
