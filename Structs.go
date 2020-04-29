@@ -21,8 +21,3 @@ func (repos ByLastCommit) Less(i, j int) bool {
 func (repos ByLastCommit) Swap(i, j int) {
 	repos[i], repos[j] = repos[j], repos[i]
 }
-
-type GetProjectsRequest struct {
-	ProjectsCount uint16 `json:"projectsCount"`
-	Username      string `json:"username"`
-}

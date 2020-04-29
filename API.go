@@ -5,24 +5,23 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 )
 
 var router = mux.NewRouter()
 
 func init() {
-	router.HandleFunc("/activeProjects", GetActiveProjects).Methods("GET")
-	router.HandleFunc("/stars", GetStarsCount).Methods("GET")
-	router.HandleFunc("/watchers", GetProjectWatchers).Methods("GET")
-	router.HandleFunc("/forks", GetProjectForks).Methods("GET")
+	router.HandleFunc("/activeProjects/{count}/{username}", GetActiveProjects).Methods("GET")
+	router.HandleFunc("/stars/{username}", GetStarsCount).Methods("GET")
+	router.HandleFunc("/watchers/{username}", GetProjectWatchers).Methods("GET")
+	router.HandleFunc("/forks/{username}", GetProjectForks).Methods("GET")
 }
 
 func GetProjectForks(writer http.ResponseWriter, req *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(req)
 
-	newMessage := new(GetProjectsRequest)
-	decodeRequestMessage(req, newMessage)
-
-	err := json.NewEncoder(writer).Encode(CalcAllForks(newMessage.Username))
+	err := json.NewEncoder(writer).Encode(CalcAllForks(params["username"]))
 	if err != nil {
 		EncodingJSONError(err)
 	}
@@ -30,11 +29,9 @@ func GetProjectForks(writer http.ResponseWriter, req *http.Request) {
 
 func GetProjectWatchers(writer http.ResponseWriter, req *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(req)
 
-	newMessage := new(GetProjectsRequest)
-	decodeRequestMessage(req, newMessage)
-
-	err := json.NewEncoder(writer).Encode(CalcAllWatchers(newMessage.Username))
+	err := json.NewEncoder(writer).Encode(CalcAllWatchers(params["username"]))
 	if err != nil {
 		EncodingJSONError(err)
 	}
@@ -42,11 +39,9 @@ func GetProjectWatchers(writer http.ResponseWriter, req *http.Request) {
 
 func GetStarsCount(writer http.ResponseWriter, req *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(req)
 
-	newMessage := new(GetProjectsRequest)
-	decodeRequestMessage(req, newMessage)
-
-	err := json.NewEncoder(writer).Encode(CalcAllStarts(newMessage.Username))
+	err := json.NewEncoder(writer).Encode(CalcAllStarts(params["username"]))
 	if err != nil {
 		EncodingJSONError(err)
 	}
@@ -54,29 +49,21 @@ func GetStarsCount(writer http.ResponseWriter, req *http.Request) {
 
 func GetActiveProjects(writer http.ResponseWriter, req *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(req)
 
-	var newMessage GetProjectsRequest
-	decodeRequestMessage(req, &newMessage)
+	projCount, err := strconv.Atoi(params["count"])
+	if err != nil {
+		fmt.Println(fmt.Errorf("Cannot convert 'count' parameter to number: %v", err))
+	}
 
-	projects := GetLastActiveProjects(newMessage.ProjectsCount, newMessage.Username)
+	projects := GetLastActiveProjects(uint16(projCount), params["username"])
 
-	err := json.NewEncoder(writer).Encode(projects)
+	err = json.NewEncoder(writer).Encode(projects)
 	if err != nil {
 		EncodingJSONError(err)
 	}
 }
 
-func decodeRequestMessage(req *http.Request, newMessage *GetProjectsRequest) {
-	err := json.NewDecoder(req.Body).Decode(newMessage)
-	DecodingJSONError(err)
-}
-
 func EncodingJSONError(err error) {
 	fmt.Println(fmt.Errorf("Error while decoding JSON: %v\n", err))
-}
-
-func DecodingJSONError(err error) {
-	if err != nil {
-		fmt.Println(fmt.Errorf("Error while decoding JSON: %v\n", err))
-	}
 }
