@@ -11,46 +11,42 @@ import (
 
 var Client = *github.NewClient(nil)
 
-func GetLastActiveProjects(projectCount uint16, user string) []Repository {
+func GetLastActiveProjects(projectCount uint16, user string) (lastRepos []Repository) {
 	allProjects := GetMyProjects(user)
 	SortProjects(allProjects)
 
-	var lastRepos []Repository
 	for i := uint16(0); i < projectCount; i++ {
 		lastRepos = append(lastRepos, allProjects[i])
 	}
 
-	return lastRepos
+	return
 }
 
-func SortProjects(projects []Repository) {
-	sort.Sort(ByLastCommit(projects))
-}
-
-func GetMyProjects(user string) []Repository {
+func GetMyProjects(user string) (allRepos []Repository) {
 	reposList, _, err := Client.Repositories.List(context.Background(), user, nil)
 	if err != nil {
 		fmt.Println(fmt.Errorf("Cannot read from client: %v\n", err))
 	}
 
-	var allRepos []Repository
 	for _, oneRepo := range reposList {
 		allRepos = append(allRepos, DecodeReposData(oneRepo))
 	}
 
-	return allRepos
+	return
 }
 
-func DecodeReposData(data *github.Repository) Repository {
-	decodedRepo := Repository{}
-
+func DecodeReposData(data *github.Repository) (decodedRepo Repository) {
 	decodedRepo.FullName = data.GetFullName()
 	decodedRepo.LastPushDays = CalcDaysToLastPush(data.GetPushedAt())
 	decodedRepo.StarsCount = uint16(data.GetStargazersCount())
 	decodedRepo.WatchersCount = uint16(data.GetWatchersCount())
 	decodedRepo.ForksCount = uint16(data.GetForksCount())
 
-	return decodedRepo
+	return
+}
+
+func SortProjects(projects []Repository) {
+	sort.Sort(ByLastCommit(projects))
 }
 
 func CalcDaysToLastPush(lastPushTimestamp github.Timestamp) uint32 {
