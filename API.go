@@ -11,7 +11,33 @@ var router = mux.NewRouter()
 
 func init() {
 	router.HandleFunc("/activeProjects", GetActiveProjects).Methods("GET")
-	router.HandleFunc("/starsCount", GetStarsCount).Methods("GET")
+	router.HandleFunc("/stars", GetStarsCount).Methods("GET")
+	router.HandleFunc("/watchers", GetProjectWatchers).Methods("GET")
+	router.HandleFunc("/forks", GetProjectForks).Methods("GET")
+}
+
+func GetProjectForks(writer http.ResponseWriter, req *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+
+	newMessage := new(GetProjectsRequest)
+	decodeRequestMessage(req, newMessage)
+
+	err := json.NewEncoder(writer).Encode(CalcAllForks(newMessage.Username))
+	if err != nil {
+		EncodingJSONError(err)
+	}
+}
+
+func GetProjectWatchers(writer http.ResponseWriter, req *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+
+	newMessage := new(GetProjectsRequest)
+	decodeRequestMessage(req, newMessage)
+
+	err := json.NewEncoder(writer).Encode(CalcAllWatchers(newMessage.Username))
+	if err != nil {
+		EncodingJSONError(err)
+	}
 }
 
 func GetStarsCount(writer http.ResponseWriter, req *http.Request) {

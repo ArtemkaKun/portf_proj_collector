@@ -1,9 +1,11 @@
 package main
 
 type Repository struct {
-	FullName     string `json:"fullName"`
-	LastPushDays uint32 `json:"lastPushDays"`
-	StarsCount   uint16 `json:"starsCount"`
+	FullName      string `json:"fullName"`
+	LastPushDays  uint32 `json:"lastPushDays"`
+	StarsCount    uint16 `json:"starsCount"`
+	WatchersCount uint16 `json:"watchersCount"`
+	ForksCount    uint16 `json:"forksCount"`
 }
 
 type ByLastCommit []Repository
