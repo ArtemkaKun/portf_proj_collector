@@ -52,23 +52,38 @@ func WriteSimpleStatsAnswer(answerType uint8, writer http.ResponseWriter, params
 	case 2:
 		err = json.NewEncoder(writer).Encode(CalcAllStarts(params["username"]))
 	case 3:
-		projects := GetLastActiveProjects(uint16(ParameterToInt(params)), params["username"])
+		projects := GetLastActiveProjects(uint16(ParameterToInt(params["count"], writer)), params["username"])
 		err = json.NewEncoder(writer).Encode(projects)
 	}
 
 	if err != nil {
-		EncodingJSONError(err)
+		EncodingJSONError(err, writer)
 	}
 }
 
-func ParameterToInt(params map[string]string) (projCount int) {
-	projCount, err := strconv.Atoi(params["count"])
+func ParameterToInt(param string, writer http.ResponseWriter) (projCount int) {
+	projCount, err := strconv.Atoi(param)
+
 	if err != nil {
-		fmt.Println(fmt.Errorf("Cannot convert 'count' parameter to number: %v", err))
+		errorRequest := map[string]string{}
+		errorMessage := fmt.Sprintf("%v", fmt.Errorf("Cannot convert 'count' parameter to number: %v", err))
+		errorRequest["error"] = errorMessage
+
+		err = json.NewEncoder(writer).Encode(errorRequest)
+		if err != nil {
+			EncodingJSONError(err, writer)
+		}
+
+		fmt.Println(errorMessage)
 	}
 	return
 }
 
-func EncodingJSONError(err error) {
-	fmt.Println(fmt.Errorf("Error while decoding JSON: %v\n", err))
+func EncodingJSONError(err error, writer http.ResponseWriter) {
+	errorRequest := map[string]string{}
+	errorMessage := fmt.Sprintf("%v", fmt.Errorf("Error while decoding JSON: %v\n", err))
+	errorRequest["error"] = errorMessage
+
+	json.NewEncoder(writer).Encode(errorRequest)
+	fmt.Println(errorMessage)
 }
