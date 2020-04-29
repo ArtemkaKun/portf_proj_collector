@@ -84,6 +84,10 @@ func EncodingJSONError(err error, writer http.ResponseWriter) {
 	errorMessage := fmt.Sprintf("%v", fmt.Errorf("Error while decoding JSON: %v\n", err))
 	errorRequest["error"] = errorMessage
 
-	json.NewEncoder(writer).Encode(errorRequest)
+	err = json.NewEncoder(writer).Encode(errorRequest)
+	if err != nil {
+		EncodingJSONError(err, writer)
+	}
+
 	fmt.Println(errorMessage)
 }
