@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	log.Fatal(http.ListenAndServe(":8001", router))
+	log.Fatal(http.ListenAndServe(":8001", Router))
 }
